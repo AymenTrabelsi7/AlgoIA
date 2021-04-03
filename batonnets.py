@@ -39,9 +39,20 @@ def ordiJoue(N):
 
     # Détermination du meilleur coup
 
-    meilleurCoup = valeurMax(N)  # à modifier...
+    #Version sans alpha beta
+    #coups = [[valeurMin(N - i), i] for i in range(1, len(coupsPossibles(N)) + 1)]
 
-    return meilleurCoup
+    #Version avec
+    #On initialise alpha et beta à -infini et +infini respectivement
+    #On calcule le score de chaque coups possible, en associant le coup correspondant à chaque
+    #fois
+    coups = [[valeurMinAlphaBeta(N - i, -2, 2), i] for i in range(1, len(coupsPossibles(N)) + 1)]
+
+    #On extrait les scores pour calculer le max
+    valeursCoups = [coups[i][0] for i in range(len(coups))]
+    maxScore = max(valeursCoups)
+
+    return coups[valeursCoups.index(maxScore)][1]
 
 
 def coupsPossibles(N):
@@ -49,55 +60,97 @@ def coupsPossibles(N):
     for i in range(1, 4):
         if i <= N:
             coups.append(i)
+
     return coups
 
 
 def valeurMax(N):
-    """
-    Retourne la valeur minimax d'un noeud MAX avec N batônnets
 
-    Si le joueur précédent a perdu (N=0),
-        retourne RECOMPENSE car ordi a gagné
-    """
-
-    # pour connaître le nombre total de noeuds explorés:
     global nbNoeudsExplores
-    nbNoeudsExplores = nbNoeudsExplores + 1
 
+    #On est dans une feuille de l'arbre
     if N == 0:
+        #L'ordi a gagné, donc récompense positive
         return RECOMPENSE
+    # On est dans une branche de l'arbre
     else:
-        coupsTest = coupsPossibles(N)
-        noeuds = [valeurMin(N-i) for i in range(1, len(coupsTest)+1)]
-        valeur = max(noeuds)
-        return valeur
+        #On initialise la valeur max à -infini (le pire des cas pour l'ordinateur)
+        maxEval = -2
+        coups = len(coupsPossibles(N))
+        i = 1
+        while i <= coups:
+            nbNoeudsExplores += 1
+            #On évalue le coups actuel
+            currentEval = valeurMin(N - i)
+            #On remplace la valeur max actuelle SI le coup en cours d'évaluation donne un score plus élevé
+            maxEval = max(maxEval, currentEval)
+            i += 1
+    return maxEval
 
 
 def valeurMin(N):
-    """
-    Retourne la valeur minimax d'un noeud MINI avec N batônnets
 
-    Si le joueur précédent a perdu (N=0),
-        retourne -RECOMPENSE car ordi a perdu
-    """
-
-    # pour connaître le nombre total de noeuds explorés:
     global nbNoeudsExplores
-    nbNoeudsExplores = nbNoeudsExplores + 1
+
+    if N == 0:
+        # L'ordi a perdu, donc récompense négative
+        return -RECOMPENSE
+    else:
+        # On initialise la valeur min à +infini (le meilleur des cas pour l'adversaire)
+        minEval = 2
+        coups = len(coupsPossibles(N))
+        i = 1
+        while i <= coups:
+            nbNoeudsExplores += 1
+            currentEval = valeurMax(N - i)
+            minEval = min(minEval, currentEval)
+            i += 1
+    return minEval
+
+def valeurMaxAlphaBeta(N, alpha, beta):
+
+    global nbNoeudsExplores
 
     if N == 0:
         return RECOMPENSE
     else:
-        coupsTest = coupsPossibles(N)
-        noeuds = [valeurMax(N-i) for i in range(1, len(coupsTest)+1)]
-        valeur = min(noeuds)
-        return valeur
+        maxEval = -2
+        coups = len(coupsPossibles(N))
+        i = 1
+        #On s'arrête si le coup actuellement étudié (alpha) est plus grand que la valeur minimale actuelle (beta)
+        #Si oui, alors cette partie de l'arbre ne sera jamais atteinte, donc inutile de la parcourir
+        while i <= coups and beta > alpha:
+            nbNoeudsExplores += 1
+            currentEval = valeurMinAlphaBeta(N - i, alpha, beta)
+            maxEval = max(maxEval, currentEval)
+            alpha = max(alpha, currentEval)
+            i += 1
+    return maxEval
+
+def valeurMinAlphaBeta(N, alpha, beta):
+
+    global nbNoeudsExplores
+
+    if N == 0:
+        return -RECOMPENSE
+    else:
+        minEval = 2
+        coups = len(coupsPossibles(N))
+        i = 1
+        while i <= coups and beta > alpha:
+            nbNoeudsExplores += 1
+            currentEval = valeurMaxAlphaBeta(N - i, alpha, beta)
+            minEval = min(minEval, currentEval)
+            beta = min(beta, currentEval)
+            i += 1
+    return minEval
+
+
 
 
 ######### Programme principal ##########
 
 # Etat initial
-
 N = 27
 
 # Qui commence ?
@@ -128,4 +181,3 @@ if joueur == 1:
     print("PERDU (ordi a gagné) !")
 else:
     print("GAGNE (ordi a perdu) !")
-
