@@ -85,7 +85,7 @@ def valeurMax(N):
             #On remplace la valeur max actuelle SI le coup en cours d'évaluation donne un score plus élevé
             maxEval = max(maxEval, currentEval)
             i += 1
-    return maxEval
+        return maxEval
 
 
 def valeurMin(N):
@@ -105,7 +105,7 @@ def valeurMin(N):
             currentEval = valeurMax(N - i)
             minEval = min(minEval, currentEval)
             i += 1
-    return minEval
+        return minEval
 
 def valeurMaxAlphaBeta(N, alpha, beta):
 
@@ -125,7 +125,7 @@ def valeurMaxAlphaBeta(N, alpha, beta):
             maxEval = max(maxEval, currentEval)
             alpha = max(alpha, currentEval)
             i += 1
-    return maxEval
+        return maxEval
 
 def valeurMinAlphaBeta(N, alpha, beta):
 
@@ -143,7 +143,7 @@ def valeurMinAlphaBeta(N, alpha, beta):
             minEval = min(minEval, currentEval)
             beta = min(beta, currentEval)
             i += 1
-    return minEval
+        return minEval
 
 
 
