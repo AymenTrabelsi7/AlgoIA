@@ -201,24 +201,43 @@ def ordiJoue(etat, profondeur_max):
     # Détermination du meilleur coup
     coups = coupsPossibles(etat)
     etatsPossibles = getEtatsPossibles(etat, coups)
-    evalCoups = [valeurMin(etatsPossibles[i], 1, 8) for i in range(len(etatsPossibles))]
+
+
+    #evalCoups = [valeurMin(etatsPossibles[i], 1, 8) for i in range(len(etatsPossibles))]
+
+    evalCoups = [valeurMinAlphaBeta(etatsPossibles[i], 1, 8, -2*RECOMPENSE, 2*RECOMPENSE) for i in range(len(etatsPossibles))]
+
     maxEval = max(evalCoups)
     meilleurCoup = coups[evalCoups.index(maxEval)]
 
+    print("Estimation de l'ordi (Eval = " + str(maxEval) + ") : ")
+
+    estimation(maxEval)
+
     return meilleurCoup
+
+def estimation(score):
+    if score == RECOMPENSE:
+        print("Je vais gagner")
+    elif score > 0:
+        print("Je vais sûrement gagner")
+    elif score < 0:
+        print("Je peux faire match nul")
+    elif score == -RECOMPENSE:
+        print("Je vais perdre")
 
 
 def valeurMax(etat, profondeur, profondeur_max):
     global nbNoeudsExplores
 
     if testFin(etat, joueur) or profondeur == profondeur_max:
-        return evaljoueur(etat, joueur)
+        return evaluation(etat)
     else:
         maxEval = -2 * RECOMPENSE  # -infini
         coups = coupsPossibles(etat)
         i = 1
         while i < len(coups):
-            nbNoeudsExplores = nbNoeudsExplores + 1
+            nbNoeudsExplores += 1
             currentEtat = copieEtat(etat)
             jouerCoup(currentEtat, coups[i], joueur)
             currentEval = valeurMin(currentEtat, profondeur + 1,profondeur_max)
@@ -232,17 +251,56 @@ def valeurMin(etat, profondeur, profondeur_max):
     global nbNoeudsExplores
 
     if testFin(etat, -joueur) or profondeur == profondeur_max:
-        return evaljoueur(etat, -joueur)
+        return evaluation(etat)
     else:
         minEval = 2 * RECOMPENSE  # +infini
         coups = coupsPossibles(etat)
         i = 1
         while i < len(coups):
-            nbNoeudsExplores = nbNoeudsExplores + 1
+            nbNoeudsExplores += 1
             currentEtat = copieEtat(etat)
             jouerCoup(currentEtat, coups[i], -joueur)
             currentEval = valeurMax(currentEtat, profondeur + 1, profondeur_max)
             minEval = min(minEval, currentEval)
+            i += 1
+        return minEval
+
+def valeurMaxAlphaBeta(etat, profondeur, profondeur_max, alpha, beta):
+    global nbNoeudsExplores
+
+    if testFin(etat, joueur) or profondeur == profondeur_max:
+        return evaluation(etat)
+    else:
+        maxEval = -2 * RECOMPENSE  # -infini
+        coups = coupsPossibles(etat)
+        i = 1
+        while i < len(coups) and beta > alpha:
+            nbNoeudsExplores += 1
+            currentEtat = copieEtat(etat)
+            jouerCoup(currentEtat, coups[i], joueur)
+            currentEval = valeurMinAlphaBeta(currentEtat, profondeur + 1, profondeur_max, alpha, beta)
+            maxEval = max(maxEval, currentEval)
+            alpha = max(alpha, currentEval)
+            i += 1
+        return maxEval
+
+def valeurMinAlphaBeta(etat, profondeur, profondeur_max, alpha, beta):
+
+    global nbNoeudsExplores
+
+    if testFin(etat, -joueur) or profondeur == profondeur_max:
+        return evaluation(etat)
+    else:
+        minEval = 2 * RECOMPENSE  # +infini
+        coups = coupsPossibles(etat)
+        i = 1
+        while i < len(coups) and beta > alpha:
+            nbNoeudsExplores += 1
+            currentEtat = copieEtat(etat)
+            jouerCoup(currentEtat, coups[i], -joueur)
+            currentEval = valeurMaxAlphaBeta(currentEtat, profondeur + 1, profondeur_max, alpha, beta)
+            minEval = min(minEval, currentEval)
+            beta = min(beta, currentEval)
             i += 1
         return minEval
 
