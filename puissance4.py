@@ -241,9 +241,9 @@ def ordiJoue(etat, profondeur_max):
     maxEval = max(evalCoups)
     meilleurCoup = coups[evalCoups.index(maxEval)]
 
-    #print("Estimation de l'ordi (Eval = " + str(maxEval) + ") : ")
+    print("Estimation de l'ordi (Eval = " + str(maxEval) + ") : ")
 
-    #estimation(maxEval)
+    estimation(maxEval)
 
     return meilleurCoup
 
