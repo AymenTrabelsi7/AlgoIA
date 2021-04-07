@@ -1,11 +1,42 @@
-#	Puissance 4
-#	
-#	joueur -1 : humain
-#	joueur 1 : ordinateur
-import random
+"""
+Réponses aux question théoriques du TP :
+
+5)Le programme calcule pendant un temps au delà du raisonnable.
+
+6)En estimant très grossèrement que toutes les parties se terminent à la profondeur max, soit 42 (6 lignes et 7 colonnes),
+on peut estimer qu'il y a environ 6^42 noeuds à explorer. Avec une fréquence d'horloge de 3 Ghz, cela représente un temps de
+calcul de 5000 milliards d'années.
+
+
+8) Temps de calcul en secondes en fonction de la profondeur max :
+Profondeur max de 4 : 0.05
+Profondeur max de 5 : 0.34
+Profondeur max de 6 : 2.13
+Profondeur max de 7 : 13.50
+Profondeur max de 8 : 82.21
+
+On peut donc dire que l'ordi joue rapidement jusqu'à une profondeur de 6, voire 7.
+
+11)
+Temps de calcul en secondes en fonction de la profondeur max :
+Profondeur max de 4 : 0.02
+Profondeur max de 5 : 0.08
+Profondeur max de 6 : 0.26
+Profondeur max de 7 : 1.43
+Profondeur max de 8 : 4.46
+Profondeur max de 9 : 15.92
+Profondeur max de 10 : 43.08
+
+Par rapport à la version sans alpha beta, on peut augmenter la profondeur max jusqu'à 9.
+
+
+12) Pas faite car je suis tellement nul à ce jeu que l'ordi me bat même avec une profondeur max de 1.
+"""
+
+
 
 RECOMPENSE = 100  # valeur absolue de la récompense (doit être > evaluation max)
-
+PROFONDEUR_MAXIMALE = 8
 
 def afficheJeu(etat):
     # affiche le jeu
@@ -203,20 +234,21 @@ def ordiJoue(etat, profondeur_max):
     etatsPossibles = getEtatsPossibles(etat, coups)
 
 
-    #evalCoups = [valeurMin(etatsPossibles[i], 1, 8) for i in range(len(etatsPossibles))]
+    #evalCoups = [valeurMin(etatsPossibles[i], 1, profondeur_max) for i in range(len(etatsPossibles))]
 
-    evalCoups = [valeurMinAlphaBeta(etatsPossibles[i], 1, 8, -2*RECOMPENSE, 2*RECOMPENSE) for i in range(len(etatsPossibles))]
+    evalCoups = [valeurMinAlphaBeta(etatsPossibles[i], 1, profondeur_max, -2*RECOMPENSE, 2*RECOMPENSE) for i in range(len(etatsPossibles))]
 
     maxEval = max(evalCoups)
     meilleurCoup = coups[evalCoups.index(maxEval)]
 
-    print("Estimation de l'ordi (Eval = " + str(maxEval) + ") : ")
+    #print("Estimation de l'ordi (Eval = " + str(maxEval) + ") : ")
 
-    estimation(maxEval)
+    #estimation(maxEval)
 
     return meilleurCoup
 
 def estimation(score):
+    #Estime l'issue en fonction du score du coup
     if score == RECOMPENSE:
         print("Je vais gagner")
     elif score > 0:
@@ -313,6 +345,8 @@ etat = [[0 for j in range(7)] for i in range(6)]
 joueur = int(input('Qui commence (-1 : humain, 1 : ordinateur) ? '))
 
 # Boucle de jeu
+
+
 while not testFin(etat, joueur):
 
     afficheJeu(etat)
@@ -329,7 +363,8 @@ while not testFin(etat, joueur):
 
         nbNoeudsExplores = 0
 
-        coup = ordiJoue(etat, 4)
+        coup = ordiJoue(etat, PROFONDEUR_MAXIMALE)
+
         print("(après une réflexion basée sur l'exploration de " + str(nbNoeudsExplores) + " noeuds)")
         jouerCoup(etat, coup, joueur)
 

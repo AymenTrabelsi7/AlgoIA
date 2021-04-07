@@ -1,8 +1,12 @@
 """
-	Jeu des bâtonnets
+Réponses aux question théoriques du TP :
 
-	joueur = 1  => ordinateur
-	joueur = -1 => humain
+
+4) Il met environ 13 secondes pour jouer le 1er coup, en explorant 18 947 740 noeuds. S'il commence, on ne peut pas gagner.
+
+5) Le temps de calcul est maintenant d'environ 1 seconde et explore 1 180 531 noeuds, soit presque 20 fois moins.
+
+
 """
 
 # Constantes globales
@@ -40,17 +44,24 @@ def ordiJoue(N):
     # Détermination du meilleur coup
 
     #Version sans alpha beta
-    #coups = [[valeurMin(N - i), i] for i in range(1, len(coupsPossibles(N)) + 1)]
+    coups = [[valeurMin(N - i), i] for i in range(1, len(coupsPossibles(N)) + 1)]
 
     #Version avec
     #On initialise alpha et beta à -infini et +infini respectivement
     #On calcule le score de chaque coups possible, en associant le coup correspondant à chaque
     #fois
-    coups = [[valeurMinAlphaBeta(N - i, -2, 2), i] for i in range(1, len(coupsPossibles(N)) + 1)]
+    #coups = [[valeurMinAlphaBeta(N - i, -2, 2), i] for i in range(1, len(coupsPossibles(N)) + 1)]
 
     #On extrait les scores pour calculer le max
     valeursCoups = [coups[i][0] for i in range(len(coups))]
     maxScore = max(valeursCoups)
+
+    estimation = "Estimation de l'ordi : "
+
+    if maxScore == RECOMPENSE:
+        estimation += 'Je vais gagner'
+    else:
+        estimation += 'Je vais perdre'
 
     return coups[valeursCoups.index(maxScore)][1]
 
